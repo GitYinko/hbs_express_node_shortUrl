@@ -1,0 +1,14 @@
+<h2 class="my-5">{{titulo}}</h2>
+
+
+
+{{!-- //snippet para iterar en hbs, le pasamos el array de objetos que creamos para iterarlo y adentro del each pasamos
+el componente --}}
+{{#each urls }}
+
+{{!-- llamamos al componente y vamos hacer mas explisitos en el que le vamos a pasar la palabra reservada this en una
+varible, no es necesrio por que igual lo detecta de forma automatica, pero lo hacemos para saber como funciona. esto
+seria como enviar un props --}}
+{{> Article item=this}}
+
+{{/each}}

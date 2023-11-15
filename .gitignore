@@ -1,0 +1,4 @@
+# archivos que no vamos a compartir en un repositorio de github
+
+node_modules
+.env
