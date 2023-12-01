@@ -6,22 +6,22 @@
 
 const express = require("express"); //Inicializamos express
 
+const { leerUrls, agregarUrl, eliminarUrl, editarUrlForm, editarUrl, redireccionamiento } = require("../controllers/homeController");//exportacion del los metodos crud
+
+//exportamos los middleware
+const urlValidar = require("../middlewares/urlValida");
+const verificarUser = require("../middlewares/verificarUser");
+
 const router = express.Router(); //vamos a trabajar con router express
 
 
 //vamos a usar router con los manejadores de rutas
-router.get("/", (req, res) => {
-
-    //vamos a simular una BD
-    const urls = [
-        { origin: "www.google.com/yinko1", shortURL: "dasdasda1" },
-        { origin: "www.google.com/yinko2", shortURL: "dasdasda2" },
-        { origin: "www.google.com/yinko3", shortURL: "dasdasda3" },
-    ]
-
-    res.render("home", { titulo: "Pagina principal 👋", urls })
-
-})
+router.get("/", verificarUser, leerUrls)//vamos a leer los datos sempre y cuando el usuario este autenticado.
+router.post("/", urlValidar, agregarUrl)
+router.get("/eliminar/:id", eliminarUrl)// le mandamos la ruta parametrisada que tenemos en el btn eliminar y le pasamos el metodo para eliminar.
+router.get("/editar/:id", editarUrlForm)
+router.post("/editar/:id", urlValidar, editarUrl)
+router.get("/:shortURL", redireccionamiento);
 
 
 
