@@ -18,21 +18,30 @@ const urlValidar = (req, res, next) => {
 
             if (urlFrontEnd.protocol === "http:" || urlFrontEnd.protocol === "https:") {
 
-                return next()
+                return next();
 
             }
-
-
-        } else {
-
-            throw new Error("Url no valida 😱")
+            throw new Error("Tiene que tener https:// o http://");
 
         }
+
+        throw new Error("Url no valida 😱");
 
 
     } catch (error) {
 
-        return res.send("Url no valida papi")
+        if (error.message === "Invalid URL") {
+
+            req.flash("mensajes", [{ msg: "Url no valida 😱" }])
+
+        }
+        else {
+
+            req.flash("mensajes", [{ msg: error.message }])
+
+        }
+
+        return res.redirect("/");
 
     }
 

@@ -18,6 +18,14 @@ const urlSchema = new Schema({ // y va a recibir sus propiedades
         type: String,
         unique: true,
         require: true
+    },
+    user: { // vamos hacer una seudorelacion atrvez de una referencia mongoDB, AQUI ES DONDE PODEMOS INDICAR EL ID DE USER QUE VA A AGREGAR UNA URL SOLO PARA UN USUARIO Y PODER USAR UN CRUD EN ESE USAURIO.
+
+        type: Schema.Types.ObjectId, // esto lo gestiona mongoose para que tengamos un usuario con su respestivo id
+
+        ref: "User", //aqui vamos a tener la referencia que es el nombre del modelo y schema al que se quiere hacer referencia.
+
+        required: true
     }
 
 })

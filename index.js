@@ -7,8 +7,9 @@ const express = require("express");
 const { create } = require("express-handlebars");
 const session = require("express-session"); //importamos para poder crear sessiones.
 const flash = require("connect-flash");
-const passport = require("passport");//importamos Passport que es un middleware de autenticación para Node.js. passport tambien trabaja con sessiones
+const passport = require("passport");//importamos Passport que es un middleware de autenticación para Node.js. passport tambien trabaja con sesiones
 const User = require("./models/User");
+const csrf = require("csurf"); //importamos el paquete csrf que es para evaluar que los formularios sean y permanescan o que vengan de nuestro sitio web.
 
 
 //Hacemos que el index lea nuestra variable de entorno y usamos "dotenv" que es para gestionar nuestro archivo .env
@@ -127,11 +128,28 @@ passport.deserializeUser(async (user, done) => {
 })
 
 
-
 //middleware para exponer una ruta raiz que va hacer publica, tambien archivos que son estaticos. Todo lo que este es esa carpeta se expone.
 app.use(express.static(__dirname + "/public"));//le decimos con dirname que busque la carpeta public en este directorio.
 
 app.use(express.urlencoded({ extended: true })); // middleware para leer datos que viene de un formulario.
+
+
+//middleware de CSRF que vamos a estar habilitando todas las protecciones a los formulario, esto seria como un token para los formularios en el que tenemops que configurar el los formularios provengan de una parte segura del sitio web para no ser hackeados.Por lo tanto , de una forma hay que enviar ese token a los formularios.
+app.use(csrf());
+
+//vamos a configurar nuestro propio middleware para enviar el token a los formulario de forma dinamica. para no estar configurando en cada formulario.
+app.use((req, res, next) => {
+
+    // variables locales
+    res.locals.tokenCsrf = req.csrfToken(); //con este metodo de csrf sirve para cada vez que se renderice la pagina se nos va a enviar una llave que es la que nosotros pasemos que despues va a enviar a las vistas, es decir, los formularios. y esto viene del reques.csrfToken que es donde el middleware csrf guarda el token.
+
+    res.locals.mensajes = req.flash("mensajes") //ahora solo renderizamos la vista y no hace falta pasarle el objeto con el mensaje flash. ya que, con esta variable local vamos a estar enviando datos cada vez que se renderiza la pagina.
+
+    next(); //decimos que prosiga con los metodos.
+
+})
+
+
 
 //vamos a usar otro middleware para llamar a las ruta raiz del directorio routes y poder acceder a los archivos que continen las configuraciones de las petisiones http.
 app.use("/", require("./routes/home"));

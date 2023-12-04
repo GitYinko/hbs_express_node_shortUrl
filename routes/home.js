@@ -16,11 +16,11 @@ const router = express.Router(); //vamos a trabajar con router express
 
 
 //vamos a usar router con los manejadores de rutas
-router.get("/", verificarUser, leerUrls)//vamos a leer los datos sempre y cuando el usuario este autenticado.
-router.post("/", urlValidar, agregarUrl)
-router.get("/eliminar/:id", eliminarUrl)// le mandamos la ruta parametrisada que tenemos en el btn eliminar y le pasamos el metodo para eliminar.
-router.get("/editar/:id", editarUrlForm)
-router.post("/editar/:id", urlValidar, editarUrl)
+router.get("/", verificarUser, leerUrls)//vamos a leer los datos siempre y cuando el usuario este autenticado.
+router.post("/", verificarUser, urlValidar, agregarUrl)
+router.get("/eliminar/:id", verificarUser, eliminarUrl)// le mandamos la ruta parametrisada que tenemos en el btn eliminar y le pasamos el metodo para eliminar.
+router.get("/editar/:id", verificarUser, editarUrlForm)
+router.post("/editar/:id", verificarUser, urlValidar, editarUrl)
 router.get("/:shortURL", redireccionamiento);
 
 

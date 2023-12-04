@@ -10,11 +10,18 @@ const { nanoid } = require("nanoid")
 //vamos a exportar el metodo de express validator para que podamos visualizar esos mensajes de error que configuramos en las rutas.
 const { validationResult } = require("express-validator")
 
+//exportamos nodemailer par enviar correos electronicos
+const nodemailer = require("nodemailer");
+
+require("dotenv").config();//para traer nuestras variables de entorno
+
+
+
 
 //metodo para renderizar el vista del formulario register
 const registerForm = (req, res) => {
 
-    res.render("register", { mensajes: req.flash("mensajes") });
+    res.render("register"); // envimaos los mensajes flash con los errores del catch atravez de la variable locals.
 
 }
 
@@ -46,15 +53,12 @@ const registerUser = async (req, res) => {
 
     try {
 
+
         //vamos a verificar si ese ususario existe en nuestra BD, y para ello llamamos al modelo User. vamos a buscar con el metodo findOne y vamos a buscar el usuario si es que coincide el email.
         let user = await User.findOne({ email })
 
         //si el usuario ya existe le mandamos un mensaje de error 
         if (user) throw new Error("Ya existe el usuario.") // este throw new Error hace que salte al catch si entra a este if, es decir, que el mensaje del error vieja al error.message del catch.
-
-
-        //FALTA METODO PARA ENVIAR LA INFORMACION AL CORREO DEL USUARIO.
-
 
         //vamos hacer una instancia de nuestro schema y vamos a usar esa instancia. y se va a instanciar solo lo que esta en el schema y no cosas que no existan como por ejemplo "rol" 
         user = new User({ userName, email, password, tokenConfirm: nanoid(), rol: "administrador" })
@@ -63,9 +67,33 @@ const registerUser = async (req, res) => {
         await user.save();
 
 
-        //AQUI ENVIAMOS MENSAJE QUE RECIBIO CORREO PARA CONFIRMACON LA CUENTA.
-        req.flash("mensajes", [{ msg: "Revise sú correo electronico para confirmar la cuenta. Gracias!" }])
+        //ENVIAR LA INFORMACION AL CORREO DEL USUARIO.
+        const transport = nodemailer.createTransport({ //esta es la configuracion que necesita nodemailer
+            host: "sandbox.smtp.mailtrap.io",
+            port: 2525,
+            auth: {
+                user: process.env.USEREMAIL,
+                pass: process.env.PASSEMAIL
+            }
+        });
 
+        //aqui es donde configuramos el envio del email
+        await transport.sendMail({
+
+            from: '"Fred Foo 👻" <foo@example.com>', // sender address / dirección del remitente
+
+            to: user.email, // list of receivers / lista de receptores
+
+            subject: "Hola ✔erifique su cuenta de ShortUrl", // Subject line / Línea de asunto
+
+            //puede ser un mensaje en texto o en cuerpo html, en nuesto caso lo hacemos en formato html ya que necesitamos de un ancla para verificar la cuenta.
+            html: `<a href= "http://localhost:5000/auth/confirm/${user.tokenConfirm}" >Verifica tu cuenta aquí</a>`, // html body /cuerpo html 
+
+            // text: "Hello world?", // plain text body / cuerpo de texto plano
+        });
+
+        //AQUI ENVIAMOS MENSAJE QUE RECIBIO CORREO PARA CONFIRMACON LA CUENTA.
+        req.flash("mensajes", [{ msg: "Revise sú correo electronico para confirmar la cuenta. Gracias!" }]);
 
         // res.json(user);
 
@@ -105,7 +133,9 @@ const confirmarCuenta = async (req, res) => {
         //una vez que este todo OK proseguimos a guardarlo
         await userToken.save();
 
+
         req.flash("mensajes", [{ msg: "Cuenta confirmada correctamente. Puedes iniciar sesion" }])
+
 
         res.redirect("/auth/login");
 
@@ -124,7 +154,9 @@ const confirmarCuenta = async (req, res) => {
 //metodo get para renderizar el formulario login
 const loginForm = (req, res) => {
 
-    res.render("login", { mensajes: req.flash("mensajes") }) // cuando no se cumpla una validacion, la constante errors va a recibir el mensaje de error para enviarle al usuario, es decir, que pinta el error en el form.
+    // res.render("login", { mensajes: req.flash("mensajes") }) // cuando no se cumpla una validacion, la constante errors va a recibir el mensaje de error para enviarle al usuario, es decir, que pinta el error en el form.
+
+    res.render("login")
 
 }
 
@@ -215,3 +247,7 @@ module.exports = {
     cerrarSesion
 
 }
+
+//Instalamos un paquete llamdo "Nodemailer" es un módulo para aplicaciones Node.js que permite el envío de correos electrónicos de forma muy sencilla
+
+//Tambien vamos a instalar un paquete llamado "MailTrap" lo que hace es probar los envios de los correos electronicos y simula que nosotros lo estamos envaindo y que lo vamos a estar resibiendo como si fueramos el cliente. 

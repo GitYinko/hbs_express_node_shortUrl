@@ -1,6 +1,9 @@
 {{#if urlEdit}}
 
 <form action="/editar/{{urlEdit._id}}" method="post">
+
+    <input type="hidden" name="_csrf" value="{{tokenCsrf}}">
+
     <input value="{{urlEdit.origin}}" type="text" placeholder="Ingresar URL" name="origin" class="form-control my-3">
 
     <button type="submit" class="btn btn-warning mb-5">Editar URL</button>
@@ -10,6 +13,10 @@
 {{else}}
 
 <form action="/" method="post">
+
+    {{!-- este input va a colocar un token a los formularios y verificar que vienen de nuestro sitio web--}}
+    <input type="hidden" name="_csrf" value="{{tokenCsrf}}">
+
     <input type="text" placeholder="Ingresar URL" name="origin" class="form-control my-3">
 
     <button type="submit" class="btn btn-dark mb-5">Agregar</button>
