@@ -16,8 +16,6 @@ const nodemailer = require("nodemailer");
 require("dotenv").config();//para traer nuestras variables de entorno
 
 
-
-
 //metodo para renderizar el vista del formulario register
 const registerForm = (req, res) => {
 
@@ -199,7 +197,6 @@ const loginAcceso = async (req, res) => {
             throw new Error("Contraseña incorrecta");
         }
 
-
         // esta operacion está creando la sesión de usuario a travez de passport y su metodo login.
         req.login(userLogin, function (err) {
 
@@ -209,7 +206,6 @@ const loginAcceso = async (req, res) => {
             return res.redirect("/");
 
         });
-
 
     } catch (error) {
 
@@ -235,6 +231,7 @@ const cerrarSesion = (req, res, next) => {
     });
 
 };
+
 
 
 module.exports = {

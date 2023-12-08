@@ -1,0 +1,35 @@
+<h2 class="text-center uppercase mt-5">{{user.userName}}</h2>
+<p class="text-center mb-5">Edita aquí tu perfil</p>
+
+<div class="text-center my-5">
+
+    {{#if imagen}}
+
+    <img class="rounded-5" src="/Img/perfiles/{{imagen}}">
+
+    {{else}}
+
+    <img class="rounded-5" src="/Img/perfiles/perfil.jpg" width="200px" height="200px">
+
+    {{/if}}
+
+
+</div>
+
+{{!-- enctype="multipart/form-data" sirve para poder enviar nuestras img, es decir, que pueda leer los archivos y
+enviarlos --}}
+<form action="/perfil?_csrf={{tokenCsrf}}" method="post" class="form-control p-3" enctype="multipart/form-data">
+
+    <input type="hidden" name="_csrf" value="{{tokenCsrf}}"> {{!--tenemos que pasar este input para evaluar el
+    formulario, como una querry por que con "enctype="multipart/form-data" no nos tama esta linea para evaluar si el
+    form es parte del sito web. La solucion es en el action mandarlo como querry el name y el value. ahora viajando como
+    querry y n o como body.--}}
+
+    <label class="form-label my-3">Ingresar imagen de perfil</label>
+
+    <input class="form-control" type="file" name="myfile"> {{!--estre name va hacer como nuestra key para
+    que nosostros podamos recibir del lado del backend --}}
+
+    <button class="btn btn-dark mt-5">Cambiar imagen</button>
+
+</form>

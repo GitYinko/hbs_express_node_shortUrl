@@ -6,7 +6,9 @@
 
 const express = require("express"); //Inicializamos express
 
+//exportamos los controllers
 const { leerUrls, agregarUrl, eliminarUrl, editarUrlForm, editarUrl, redireccionamiento } = require("../controllers/homeController");//exportacion del los metodos crud
+const { formPerfil, editarFotoPerfil } = require("../controllers/perfilController");//exportamos los metodos del perfil.
 
 //exportamos los middleware
 const urlValidar = require("../middlewares/urlValida");
@@ -21,6 +23,10 @@ router.post("/", verificarUser, urlValidar, agregarUrl)
 router.get("/eliminar/:id", verificarUser, eliminarUrl)// le mandamos la ruta parametrisada que tenemos en el btn eliminar y le pasamos el metodo para eliminar.
 router.get("/editar/:id", verificarUser, editarUrlForm)
 router.post("/editar/:id", verificarUser, urlValidar, editarUrl)
+
+router.get("/perfil", verificarUser, formPerfil)
+router.post("/perfil", verificarUser, editarFotoPerfil)
+
 router.get("/:shortURL", redireccionamiento);
 
 

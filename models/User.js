@@ -43,6 +43,12 @@ const userSchema = new Schema({
         type: Boolean,
         default: false // por defecto va a estar en falsa pero cuando el usuario confirme la cuenta en su correo electronico va a pasar a true.
 
+    },
+    imagen: {
+
+        type: String, //lo hacemos de tipo string por no la vamos a guardar en la DB si no que en el servidor.
+        default: null, // por que un usuario cuando se registra no va a tener una img de perfil.
+
     }
 
 });

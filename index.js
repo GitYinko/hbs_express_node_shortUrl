@@ -143,7 +143,7 @@ app.use((req, res, next) => {
     // variables locales
     res.locals.tokenCsrf = req.csrfToken(); //con este metodo de csrf sirve para cada vez que se renderice la pagina se nos va a enviar una llave que es la que nosotros pasemos que despues va a enviar a las vistas, es decir, los formularios. y esto viene del reques.csrfToken que es donde el middleware csrf guarda el token.
 
-    res.locals.mensajes = req.flash("mensajes") //ahora solo renderizamos la vista y no hace falta pasarle el objeto con el mensaje flash. ya que, con esta variable local vamos a estar enviando datos cada vez que se renderiza la pagina.
+    res.locals.mensajes = req.flash("mensajes"); //ahora solo renderizamos la vista y no hace falta pasarle el objeto con el mensaje flash. ya que, con esta variable local vamos a estar enviando datos cada vez que se renderiza la pagina.
 
     next(); //decimos que prosiga con los metodos.
 

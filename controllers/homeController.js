@@ -8,18 +8,33 @@ const Url = require("../models/Url");
 
 const { nanoid } = require("nanoid");
 
+const User = require("../models/User");
+
+
 
 //vamos a crear un metodo para leer 
 const leerUrls = async (req, res) => {
 
     // console.log(req.user) // todas las rutas que tengan el middleware verificarUser tiene a disposicion el req.user
 
+    const { confirm } = req.body;
+
+
     //vamos a leer los datos de BD
     try {
+
+        let activeNav = false;
+
         //creamos a una constante en la que esperamos el modelo Url y vamos a leer esa informacion mediante el metodo find y vamos a establece con que parametros de busqueda vamos a filtrar, llamamos a lean que nos transforma el array de objetos de mongoose que seria como objetos que nos permite hacer mas cosas pero hbs no lo lee por lo tanto "lean" nos transforma esos objetos a los tradicionales de javaScript.
         const urls = await Url.find({ user: req.user.id }).lean()
 
-        return res.render("home", { titulo: "Pagina principal 👋", urls })
+        const user = await User.find(confirm)
+
+        if (user) {
+            activeNav = true;
+        }
+
+        return res.render("home", { activeNav, titulo: "Pagina principal 👋", urls })
 
 
     } catch (error) {
@@ -173,7 +188,7 @@ const redireccionamiento = async (req, res) => {
         const url = await Url.findOne({ shortURL })
 
         if (!url?.origin) {
-            throw new Error("error no existe la Url");
+            throw new Error("Error no existe la Url");
         }
         res.redirect(url.origin);
 
@@ -194,7 +209,7 @@ module.exports = {
     eliminarUrl,
     editarUrlForm,
     editarUrl,
-    redireccionamiento
+    redireccionamiento,
 
 }
 
