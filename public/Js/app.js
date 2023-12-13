@@ -11,7 +11,7 @@ document.addEventListener("click", (e) => {
 
     if (short) {
 
-        const url = `http://localhost:5000/${short}`;
+        const url = `${window.location.origin}/${short}`;
 
         //y hacemos el metodo para copiar en el porta papeles
         navigator.clipboard

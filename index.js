@@ -7,26 +7,35 @@ const express = require("express");
 const { create } = require("express-handlebars");
 const session = require("express-session"); //importamos para poder crear sessiones.
 const flash = require("connect-flash");
+
+const mongoSanitize = require('express-mongo-sanitize');
+
 const passport = require("passport");//importamos Passport que es un middleware de autenticación para Node.js. passport tambien trabaja con sesiones
+
 const User = require("./models/User");
+
 const csrf = require("csurf"); //importamos el paquete csrf que es para evaluar que los formularios sean y permanescan o que vengan de nuestro sitio web.
 
+const cors = require("cors");
+
+const MongoStore = require("connect-mongo"); //importamos connect mongo 
 
 //Hacemos que el index lea nuestra variable de entorno y usamos "dotenv" que es para gestionar nuestro archivo .env
 require("dotenv").config();
 
 //Hacemos que el index lea la conexion de la BD
-require("./database/db");
+const clientDB = require("./database/db")
+// require("./database/db");
+
 
 
 //creamos el servidor.
 const app = express();
 
-
 //LLAMAMOS A LA VARIABLE DE ENTORNO con el process.env y le pasamos un puerto que tengamos en la variable de entorno y si no exixte esa env le decimos que ocupe el puerto 5000.
 const PORT = process.env.PORT || 5000
 
-app.listen(PORT, () => console.log("Funcionando 🚀 desde el puerto " + PORT))
+app.listen(PORT, () => console.log("Funcionando desde el puerto ✨ " + PORT))
 
 
 //con estas configuraciones ya podemos usar nuestros sistemas de motores de plantillas (template engine)
@@ -46,7 +55,23 @@ app.set("view engine", ".hbs"); // la extension que es .hbs
 app.set("views", "./views");// que va a estar dentro de la carpeta views
 
 
+
 //CONFIGURACIONES DE MIDDLEWARE
+
+//configuracion para el CORS
+const corsOptions = {
+
+    credentials: true, //aqui estamos mandando credenciales dentro nuestro servidor
+
+    origin: process.env.PATHHEROKU || "*", // aqui vamos a configurar para saber cual es la url de heroku o sino por defecto hacemos que cualquier persona pueda hacer la solisitud.
+
+    methods: ['GET', 'POST'], // aqui solo pasamos los metodos que estamos utilizando, para que solo se usen estos.
+
+}
+
+//vamos a crear otro middleware con CORS para permitir a los servidores indicar a los navegadores si deben permitir la carga de recursos para un origen distinto al suyo (dominio, esquema o puerto)
+app.use(cors(corsOptions))
+
 
 //usamos el middleware para crear sessiones
 app.use(session({ //contiene configuraciones
@@ -54,8 +79,20 @@ app.use(session({ //contiene configuraciones
     secret: process.env.SESSIONSECRET,//es para darle seguridad a la session
     resave: false,//para volver a guardar
     saveUninitialized: false,//para autoguardar
-    name: "secret-name-rico" // se coloca algun name para no ocupar el name por defecto
+    name: "session-user", // se coloca algun name para no ocupar el name por defecto
+    store: MongoStore.create({ //le informamos donde se encuatra nuestra conxion de BD, porque create()? por que esto va a recibir configuraciones.
+        clientPromise: clientDB, //por que el clientDB me trae una promesa
+        dbName: process.env.DBNAME, // le incorporamos el nombre de la BD.
+
+    }),
+
+    cookie: {
+        secure: true, // va a esperar solo petisiones https, pero cuando estamos en produccion localhost es http por lo tanto no funcionario y tendria que estar en false.
+        maxAge: 30 * 24 * 60 * 60 * 1000 // esto cuanto va a durar la session.
+    }, //le agregamos seguridad a nuestra session
+
 }))//ya con esto podemos crear sessiones en nuestro sito web
+
 
 
 //hagamos un ejemplo practico para ver como funciona SESSION
@@ -150,6 +187,9 @@ app.use((req, res, next) => {
 })
 
 
+app.use(mongoSanitize()); //vamos a poner este middleware antes de las rutas por que va a estar leyendo el reques ya que va interferir en él y va hacer la limpieza y se encuantra algo unadecuado.
+
+
 
 //vamos a usar otro middleware para llamar a las ruta raiz del directorio routes y poder acceder a los archivos que continen las configuraciones de las petisiones http.
 app.use("/", require("./routes/home"));
@@ -168,3 +208,13 @@ app.use("/auth", require("./routes/auth"));
 // EXPRESS SESSION: El middleware express-session almacena los datos de sesión en el servidor; a direrencia de rest que trabajamos el back separado del fron y aqui se mezcla todo. Este middleware sólo guarda el ID de sesión en la propia cookie, no los datos de sesión. De forma predeterminada, utiliza el almacenamiento en memoria del servidor y no está diseñado para un entorno de producción. almenos que lo almacenemos en mongo con" connect-mongo".
 
 // CONNECT FLASH: El flash es un tipo de session que solo vive una vez en un área especial de la sesión que se utiliza para almacenar mensajes. Los mensajes se escriben en la memoria flash y se borran después de mostrarse al usuario. El flash generalmente se usa en combinación con redireccionamientos, lo que garantiza que el mensaje esté disponible para la siguiente página que se va a representar. que maneja sesiones por lo tanto hay que habilitar sesiones.
+
+// CONNECT-MONGO: Nos va a servir para guardar la session deL usuario en la BD y no en memoria del servidor que puede afectar el rendimiente del sitio web.
+
+//EXPRESS MONGOOSE SANITIZE:
+// ¿Para qué sirve este módulo?
+// Este módulo busca claves en objetos que comienzan con el signo $ o contienen ., de req.body, req.query o req.params. Entonces puede:
+// eliminar completamente estas claves y los datos asociados del objeto, o
+// reemplace los caracteres prohibidos con otro carácter permitido.
+
+//CORS: Esto nos ayuda a bloquear solisitudes que podemos decirle que sierto dominio va a consumir nuestra pagina web. El intercambio de recursos de origen cruzado (CORS, por sus siglas en inglés), es un mecanismo basado en cabeceras HTTP que permite a un servidor indicar cualquier dominio, esquema o puerto con un origen (en-US) distinto del suyo desde el que un navegador debería permitir la carga de recursos.

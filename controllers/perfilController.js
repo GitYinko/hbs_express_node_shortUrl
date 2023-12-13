@@ -15,11 +15,17 @@ const User = require("../models/User");
 
 module.exports.formPerfil = async (req, res,) => { //rederizamos el perfil
 
+    const { confirm } = req.body;
+
+
     try {
+        // let navAcitve = true;
 
-        const userPerfil = await User.findById(req.user.id); //userPerfil va a tener la img que le envia el usaurio.
+        const userPerfil = await User.findById(req.user.id); //userPerfil va a tener la img que le envia el usuario.
 
-        return res.render("perfil", { user: req.user, imagen: userPerfil.imagen })//aqui enviamos la info que esta en el user que viene del requery que tiene el id y el name y la imagen viene de userperfil que le instanciamos el modelo User.
+        const userConfirm = await User.find(confirm)//para el menu de navegacion
+
+        return res.render("perfil", { userConfirm, user: req.user, imagen: userPerfil.imagen })//aqui enviamos la info que esta en el user que viene del requery que tiene el id y el name y la imagen viene de userperfil que le instanciamos el modelo User.
 
 
     } catch (error) {
@@ -56,7 +62,7 @@ module.exports.editarFotoPerfil = (req, res) => { //configuramos img perfil
 
         try {
 
-            console.log(file)
+            // console.log(file)
 
             //hacemos una validacion preguntando si el usuario intento enviar un archivo vacio.
             if (file.originalFilename === "") {
@@ -105,7 +111,7 @@ module.exports.editarFotoPerfil = (req, res) => { //configuramos img perfil
                 }
             });
 
-            console.log(dirFile); //ruta que a la que mandamos el archivo.
+            // console.log(dirFile); //ruta que a la que mandamos el archivo.
 
             //ahora atravez de jimp vamos a redimensionar la imagen, es decir, reducir su tamaño.
             const image = await Jimp.read(dirFile);//vamos a leer un achivo que va hacer el que esta en dirFile que va hacer la ruta donde va a estar el archivo que sube el usuario.

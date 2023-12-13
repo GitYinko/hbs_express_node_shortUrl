@@ -19,22 +19,21 @@ const leerUrls = async (req, res) => {
 
     const { confirm } = req.body;
 
-
     //vamos a leer los datos de BD
     try {
 
-        let activeNav = false;
+        // let navAcitve = false;
 
         //creamos a una constante en la que esperamos el modelo Url y vamos a leer esa informacion mediante el metodo find y vamos a establece con que parametros de busqueda vamos a filtrar, llamamos a lean que nos transforma el array de objetos de mongoose que seria como objetos que nos permite hacer mas cosas pero hbs no lo lee por lo tanto "lean" nos transforma esos objetos a los tradicionales de javaScript.
         const urls = await Url.find({ user: req.user.id }).lean()
 
-        const user = await User.find(confirm)
+        const userConfirm = await User.find(confirm)//para el menu de navegacion
 
-        if (user) {
-            activeNav = true;
-        }
+        // if (user) {
+        //     navAcitve = true;
+        // }
 
-        return res.render("home", { activeNav, titulo: "Pagina principal 👋", urls })
+        return res.render("home", { userConfirm, titulo: "Pagina principal 👋", urls })
 
 
     } catch (error) {
