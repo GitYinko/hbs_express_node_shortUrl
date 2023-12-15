@@ -53,7 +53,7 @@ const hbs = create({ // este create va a recibir las configuraciones de express-
 app.engine(".hbs", hbs.engine); //nuestro motor de plantilla 
 app.set("view engine", ".hbs"); // la extension que es .hbs
 app.set("views", "./views");// que va a estar dentro de la carpeta views
-
+app.set("trust proxy", 1);//hace que nuestro secure de nuestro session funcione si le pasamos una varible de entorno
 
 
 //CONFIGURACIONES DE MIDDLEWARE
@@ -63,7 +63,7 @@ const corsOptions = {
 
     credentials: true, //aqui estamos mandando credenciales dentro nuestro servidor
 
-    origin: process.env.PATHHEROKU || "*", // aqui vamos a configurar para saber cual es la url de heroku o sino por defecto hacemos que cualquier persona pueda hacer la solisitud.
+    origin: process.env.PATHRAILWAY, // aqui vamos a configurar para saber cual es la url de raidway.
 
     methods: ['GET', 'POST'], // aqui solo pasamos los metodos que estamos utilizando, para que solo se usen estos.
 

@@ -85,7 +85,7 @@ const registerUser = async (req, res) => {
             subject: "Hola ✔erifique su cuenta de ShortUrl", // Subject line / Línea de asunto
 
             //puede ser un mensaje en texto o en cuerpo html, en nuesto caso lo hacemos en formato html ya que necesitamos de un ancla para verificar la cuenta.
-            html: `<a href= "${process.env.PATHHEROKU}/auth/confirm/${user.tokenConfirm}" >Verifica tu cuenta aquí</a>`, // html body /cuerpo html 
+            html: `<a href= "${process.env.PATHRAILWAY}/auth/confirm/${user.tokenConfirm}" >Verifica tu cuenta aquí</a>`, // html body /cuerpo html 
 
             // text: "Hello world?", // plain text body / cuerpo de texto plano
         });
